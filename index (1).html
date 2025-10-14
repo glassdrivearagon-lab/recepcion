@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GlassDrive - Sistema de Recepción</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- OCR Y PDF - FUNCIONANDO -->
+    <script src="https://unpkg.com/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- LOGIN RESPONSIVE -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="logolargo.png" alt="GlassDrive" class="login-logo" onerror="this.src='logolargo.jpg'">
+                <h1>GlassDrive</h1>
+                <p>Sistema de Recepción</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="selectTaller">Centro:</label>
+                    <select id="selectTaller" required>
+                        <option value="">-- Seleccionar Centro --</option>
+                        <option value="monzon">Monzón</option>
+                        <option value="barbastro">Barbastro</option>
+                        <option value="lleida">Lleida</option>
+                        <option value="fraga">Fraga</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">
+                    Iniciar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP PRINCIPAL -->
+    <div id="mainApp" class="screen">
+        <!-- HEADER RESPONSIVE -->
+        <header class="app-header">
+            <div class="header-content">
+                <img src="logolargo.png" alt="GlassDrive" class="header-logo" onerror="this.src='logolargo.jpg'">
+                <div class="header-info">
+                    <h2>GlassDrive</h2>
+                    <span id="userInfo"></span>
+                </div>
+                <button id="btnLogout" class="btn btn-secondary btn-sm">Salir</button>
+            </div>
+        </header>
+
+        <!-- NAVEGACION RESPONSIVE -->
+        <nav class="app-nav">
+            <button id="btnDashboard" class="nav-btn active">📊 Dashboard</button>
+            <button id="btnNuevoRegistro" class="nav-btn">📝 Nuevo</button>
+            <button id="btnBusqueda" class="nav-btn">🔍 Buscar</button>
+        </nav>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalVehiculos">0</div>
+                    <div class="stat-label">Total Vehículos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="registrosHoy">0</div>
+                    <div class="stat-label">Registros Hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="enProceso">0</div>
+                    <div class="stat-label">En Proceso</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completados">0</div>
+                    <div class="stat-label">Completados</div>
+                </div>
+            </div>
+
+            <div class="recent-section">
+                <h3>Registros Recientes</h3>
+                <div id="recentList" class="recent-list"></div>
+            </div>
+        </section>
+
+        <!-- BUSQUEDA -->
+        <section id="busqueda" class="content-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar por matrícula o cliente...">
+                <button id="btnSearch" class="btn btn-primary">Buscar</button>
+            </div>
+            <div id="searchResults" class="search-results"></div>
+        </section>
+    </div>
+
+    <!-- MODAL REGISTRO -->
+    <div id="registroModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nuevo Registro</h3>
+                <button id="closeModal" class="modal-close">&times;</button>
+            </div>
+
+            <!-- STEPS -->
+            <div class="steps-container">
+                <div class="step active">
+                    <span class="step-number">1</span>
+                    <span class="step-label">Fotos</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <span class="step-label">Documentos</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <span class="step-label">Firma</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <span class="step-label">Finalizar</span>
+                </div>
+            </div>
+
+            <!-- PASO 1: FOTOS -->
+            <div id="step1" class="step-content active">
+                <h4>📸 Fotografías del Vehículo</h4>
+
+                <div class="camera-container">
+                    <video id="cameraPreview" autoplay playsinline></video>
+                    <canvas id="photoCanvas" style="display: none;"></canvas>
+
+                    <div class="camera-controls">
+                        <button id="startCamera" class="btn btn-primary">📷 Cámara</button>
+                        <button id="capturePhoto" class="btn btn-success" style="display: none;">📸 Capturar</button>
+                        <button id="uploadPhoto" class="btn btn-secondary">📁 Subir</button>
+                        <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                    </div>
+                </div>
+
+                <div id="photosGrid" class="photos-grid"></div>
+
+                <!-- OCR RESULTADO -->
+                <div id="ocrResult" class="ocr-result"></div>
+            </div>
+
+            <!-- PASO 2: DOCUMENTOS -->
+            <div id="step2" class="step-content">
+                <h4>📄 Documentos del Vehículo</h4>
+
+                <div class="documents-grid">
+                    <div class="document-section">
+                        <h5>Ficha Técnica</h5>
+                        <button id="uploadFicha" class="btn btn-info">Subir Ficha</button>
+                        <input type="file" id="fichaInput" accept="image/*,.pdf" style="display: none;">
+                        <div id="fichaPreview" class="document-preview"></div>
+                        <div id="fichaData" class="extracted-data"></div>
+                    </div>
+
+                    <div class="document-section">
+                        <h5>Póliza de Seguro</h5>
+                        <button id="uploadPoliza" class="btn btn-warning">Subir Póliza</button>
+                        <input type="file" id="polizaInput" accept="image/*,.pdf" style="display: none;">
+                        <div id="polizaPreview" class="document-preview"></div>
+                        <div id="polizaData" class="extracted-data"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 3: FIRMA -->
+            <div id="step3" class="step-content">
+                <h4>✍️ Firma Digital</h4>
+
+                <div class="signature-container">
+                    <canvas id="signatureCanvas" class="signature-canvas"></canvas>
+                    <div class="signature-controls">
+                        <button id="clearSignature" class="btn btn-secondary">Limpiar</button>
+                        <button id="saveSignature" class="btn btn-success">Guardar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 4: RESUMEN -->
+            <div id="step4" class="step-content">
+                <h4>📋 Resumen del Registro</h4>
+                <div id="summary" class="summary-container"></div>
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer">
+                <button id="prevStep" class="btn btn-secondary">← Anterior</button>
+                <button id="nextStep" class="btn btn-primary">Siguiente →</button>
+                <button id="finishStep" class="btn btn-success" style="display: none;">✅ Finalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
