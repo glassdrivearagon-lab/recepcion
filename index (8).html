@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassDrive MVP - Con Calibración</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- PANTALLA DE LOGIN -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo-container">
+                    <img src="logolargo.png" alt="GlassDrive" class="login-logo">
+                </div>
+                <h1>GlassDrive MVP</h1>
+                <p>Sistema con gestión de calibraciones</p>
+                <div class="mvp-badge">
+                    <span class="mvp-text">🚀 MVP + CALIBRACIONES</span>
+                    <span class="mvp-features">OCR • Archivos • PDF • Calibraciones</span>
+                </div>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="selectTaller">Centro GlassDrive:</label>
+                    <select id="selectTaller" required>
+                        <option value="">-- Seleccionar Centro --</option>
+                        <option value="monzon">Monzón</option>
+                        <option value="barbastro">Barbastro</option>
+                        <option value="lleida">Lleida</option>
+                        <option value="fraga">Fraga</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">
+                    🚀 Iniciar Demo MVP
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="mainApp" class="screen">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo-container-header">
+                        <img src="logolargo.png" alt="GlassDrive" class="header-logo">
+                    </div>
+                    <div class="header-info">
+                        <h2>GlassDrive MVP</h2>
+                        <span id="userInfo" class="user-info"></span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="mvp-indicator">
+                        <span class="mvp-dot"></span>
+                        <span>DEMO</span>
+                    </div>
+                    <button id="btnLogout" class="btn btn-outline btn-sm">Cerrar</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- NAVEGACIÓN -->
+        <nav class="app-nav">
+            <button id="btnDashboard" class="nav-btn active">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Dashboard</span>
+            </button>
+            <button id="btnNuevoRegistro" class="nav-btn">
+                <span class="nav-icon">📝</span>
+                <span class="nav-label">Nuevo</span>
+                <span class="nav-badge">MVP</span>
+            </button>
+            <button id="btnCalibraciones" class="nav-btn">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-label">Calibrar</span>
+                <span class="nav-badge" id="calibracionesBadge">0</span>
+            </button>
+            <button id="btnGaleria" class="nav-btn">
+                <span class="nav-icon">🖼️</span>
+                <span class="nav-label">Galería</span>
+            </button>
+            <button id="btnBusqueda" class="nav-btn">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Búsqueda</span>
+            </button>
+        </nav>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h3>Dashboard MVP</h3>
+                <p>Sistema con OCR y gestión de calibraciones</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">🚗</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalVehiculos">0</div>
+                        <div class="stat-label">Vehículos</div>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon">📸</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalFotos">0</div>
+                        <div class="stat-label">Fotos</div>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalCalibraciones">0</div>
+                        <div class="stat-label">Calibraciones</div>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalPDFs">0</div>
+                        <div class="stat-label">PDFs</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-section">
+                <div class="section-header">
+                    <h4>📋 Expedientes Recientes</h4>
+                </div>
+                <div id="recentList" class="recent-list"></div>
+            </div>
+        </section>
+
+        <!-- CALIBRACIONES -->
+        <section id="calibraciones" class="content-section">
+            <div class="section-header">
+                <h3>🎯 Gestión de Calibraciones</h3>
+                <p>Vehículos pendientes y completados</p>
+            </div>
+
+            <div class="calibraciones-tabs">
+                <button id="tabPendientes" class="tab-btn active">
+                    🔄 Pendientes (<span id="pendientesCount">0</span>)
+                </button>
+                <button id="tabCompletadas" class="tab-btn">
+                    ✅ Completadas (<span id="completadasCount">0</span>)
+                </button>
+            </div>
+
+            <div id="calibracionesList" class="calibraciones-content"></div>
+        </section>
+
+        <!-- GALERÍA -->
+        <section id="galeria" class="content-section">
+            <div class="section-header">
+                <h3>🖼️ Galería Global</h3>
+                <p>Todos los archivos del sistema</p>
+            </div>
+            <div id="galeriaContent" class="galeria-content"></div>
+        </section>
+
+        <!-- BÚSQUEDA -->
+        <section id="busqueda" class="content-section">
+            <div class="section-header">
+                <h3>🔍 Búsqueda</h3>
+                <p>Buscar expedientes</p>
+            </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar por matrícula, cliente...">
+                    <button id="btnSearch" class="btn btn-primary">🔍</button>
+                </div>
+            </div>
+
+            <div id="searchResults" class="search-results"></div>
+        </section>
+    </div>
+
+    <!-- MODAL DE REGISTRO CON CALIBRACIÓN -->
+    <div id="registroModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h3>📝 Nuevo Expediente</h3>
+                    <p>Proceso: Foto → Docs → Calibración → Firma → PDF</p>
+                </div>
+                <button id="closeModal" class="modal-close">&times;</button>
+            </div>
+
+            <!-- STEPS CON CALIBRACIÓN -->
+            <div class="steps-container">
+                <div class="step active" data-step="1">
+                    <div class="step-icon">📸</div>
+                    <div class="step-label">Foto</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-icon">📄</div>
+                    <div class="step-label">Docs</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-icon">🎯</div>
+                    <div class="step-label">Calibrar</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-icon">✍️</div>
+                    <div class="step-label">Firma</div>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-icon">📋</div>
+                    <div class="step-label">PDF</div>
+                </div>
+            </div>
+
+            <!-- CONTENIDO DE PASOS -->
+            <div id="modalBody" class="modal-body">
+
+                <!-- PASO 1: CAPTURA DE FOTO CON OCR -->
+                <div id="step1" class="step-panel active">
+                    <div class="step-header">
+                        <h4>📸 Captura de Foto</h4>
+                        <p>Captura o sube la foto del vehículo</p>
+                    </div>
+
+                    <div class="camera-section">
+                        <div class="camera-controls">
+                            <button id="startCamera" class="btn btn-info btn-mobile">
+                                📷 Abrir Cámara
+                            </button>
+                            <button id="uploadPhoto" class="btn btn-secondary btn-mobile">
+                                📁 Subir Foto
+                            </button>
+                            <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                        </div>
+
+                        <div class="camera-container">
+                            <video id="cameraPreview" autoplay playsinline style="display: none;"></video>
+                            <button id="capturePhoto" class="btn btn-success btn-mobile" style="display: none;">
+                                📸 Capturar Foto
+                            </button>
+                            <canvas id="photoCanvas" style="display: none;"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="photosGrid" class="photos-grid-mobile"></div>
+                    <div id="ocrResult" class="ocr-result"></div>
+                </div>
+
+                <!-- PASO 2: DOCUMENTOS -->
+                <div id="step2" class="step-panel">
+                    <div class="step-header">
+                        <h4>📄 Documentos</h4>
+                        <p>Sube la ficha técnica y póliza</p>
+                    </div>
+
+                    <div class="documents-mobile">
+                        <!-- FICHA TÉCNICA -->
+                        <div class="document-section-mobile">
+                            <h5>📋 Ficha Técnica</h5>
+                            <div class="upload-zone-mobile" id="fichaUploadZone">
+                                <div class="upload-icon">📋</div>
+                                <p>Seleccionar ficha técnica</p>
+                                <button type="button" class="btn btn-info btn-mobile">Seleccionar</button>
+                            </div>
+                            <input type="file" id="fichaInput" accept="image/*,.pdf" style="display: none;">
+                            <div id="fichaPreview" class="document-preview-mobile"></div>
+                        </div>
+
+                        <!-- PÓLIZA -->
+                        <div class="document-section-mobile">
+                            <h5>🛡️ Póliza de Seguro</h5>
+                            <div class="upload-zone-mobile" id="polizaUploadZone">
+                                <div class="upload-icon">🛡️</div>
+                                <p>Seleccionar póliza</p>
+                                <button type="button" class="btn btn-warning btn-mobile">Seleccionar</button>
+                            </div>
+                            <input type="file" id="polizaInput" accept="image/*,.pdf" style="display: none;">
+                            <div id="polizaPreview" class="document-preview-mobile"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 3: CALIBRACIÓN -->
+                <div id="step3" class="step-panel">
+                    <div class="step-header">
+                        <h4>🎯 ¿Necesita Calibración?</h4>
+                        <p>Determine si el vehículo requiere calibración</p>
+                    </div>
+
+                    <div class="calibracion-form">
+                        <div class="calibracion-question">
+                            <div class="question-card">
+                                <div class="question-icon">🎯</div>
+                                <h5>¿Este vehículo necesita calibración?</h5>
+                                <p>La calibración es necesaria después de cambios en el parabrisas o sistemas ADAS</p>
+                            </div>
+
+                            <div class="calibracion-options">
+                                <button id="calibracionNo" class="btn btn-outline calibracion-btn">
+                                    ❌ NO - Continuar proceso
+                                </button>
+                                <button id="calibracionSi" class="btn btn-warning calibracion-btn">
+                                    ✅ SÍ - Requiere calibración
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="calibracionInfo" class="calibracion-info" style="display: none;">
+                            <div class="info-card">
+                                <div class="info-icon">📋</div>
+                                <h6>Información de Calibración</h6>
+                                <div class="calibracion-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Centro:</span>
+                                        <span id="calibracionCentro" class="detail-value">-</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Matrícula:</span>
+                                        <span id="calibracionMatricula" class="detail-value">-</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Estado:</span>
+                                        <span class="detail-value calibracion-pending">Pendiente de calibrar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 4: FIRMA DIGITAL -->
+                <div id="step4" class="step-panel">
+                    <div class="step-header">
+                        <h4>✍️ Firma Digital</h4>
+                        <p>Firma con el dedo en la pantalla</p>
+                    </div>
+
+                    <div class="signature-section-mobile">
+                        <div class="signature-container-mobile">
+                            <canvas id="signatureCanvas" class="signature-canvas-mobile"></canvas>
+                            <div class="signature-placeholder" id="signaturePlaceholder">
+                                <div class="placeholder-icon">✍️</div>
+                                <p>Firme aquí con el dedo</p>
+                            </div>
+                        </div>
+
+                        <div class="signature-controls-mobile">
+                            <button id="clearSignature" class="btn btn-outline btn-mobile">🗑️ Limpiar</button>
+                            <button id="saveSignature" class="btn btn-success btn-mobile">✅ Guardar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 5: RESUMEN Y PDF -->
+                <div id="step5" class="step-panel">
+                    <div class="step-header">
+                        <h4>📋 Generar Informe</h4>
+                        <p>Resumen y descarga del PDF</p>
+                    </div>
+
+                    <div id="summary" class="summary-mobile">
+                        <div class="summary-card-mobile">
+                            <h5>📊 Resumen del Expediente</h5>
+                            <div id="summaryContent" class="summary-content-mobile"></div>
+                        </div>
+
+                        <div class="pdf-options-mobile">
+                            <div class="pdf-preview-mobile">
+                                <h6>📄 Vista Previa del Informe</h6>
+                                <div class="pdf-header-preview">
+                                    <div class="logo-container-pdf">
+                                        <img src="logolargo.png" alt="GlassDrive" class="logo-pdf">
+                                    </div>
+                                    <div class="center-info-pdf" id="centerInfoPDF">
+                                        <h4>Centro: Monzón</h4>
+                                        <p>Fecha: <span id="currentDate"></span></p>
+                                    </div>
+                                </div>
+                                <div class="pdf-content-preview">
+                                    <p>📋 Matrícula: <span id="pdfMatricula">-</span></p>
+                                    <p>📸 Fotos: <span id="pdfFotos">0</span></p>
+                                    <p>📄 Documentos: <span id="pdfDocs">0</span></p>
+                                    <p>🎯 Calibración: <span id="pdfCalibracion">No requerida</span></p>
+                                    <p>✍️ Firma: <span id="pdfFirma">No</span></p>
+                                </div>
+                            </div>
+
+                            <button id="generatePDFBtn" class="btn btn-success btn-large btn-mobile">
+                                📥 Descargar Informe PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER MODAL -->
+            <div class="modal-footer-mobile">
+                <div class="progress-mobile">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="footer-controls-mobile">
+                    <button id="prevStep" class="btn btn-outline btn-mobile" style="display: none;">
+                        ← Anterior
+                    </button>
+                    <button id="nextStep" class="btn btn-primary btn-mobile">
+                        Siguiente →
+                    </button>
+                    <button id="finishStep" class="btn btn-success btn-mobile" style="display: none;">
+                        🎉 Finalizar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CALIBRACIÓN -->
+    <div id="calibracionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h3>🎯 Proceso de Calibración</h3>
+                    <p>Gestión completa del proceso de calibración</p>
+                </div>
+                <button id="closeCalibracionModal" class="modal-close">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="calibracionContent" class="calibracion-process">
+                    <!-- Contenido dinámico según el estado de calibración -->
+                </div>
+            </div>
+
+            <div class="modal-footer-mobile">
+                <div class="footer-controls-mobile">
+                    <button id="cancelCalibracion" class="btn btn-outline btn-mobile">
+                        ❌ Cancelar
+                    </button>
+                    <button id="saveCalibracion" class="btn btn-success btn-mobile">
+                        ✅ Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
