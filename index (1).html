@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GlassDrive MVP - Sistema Completo con Gestión de Archivos</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- jsPDF para PDF con fotos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- LOGIN CORPORATIVO -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="logolargo.png" alt="GlassDrive" class="login-logo" onerror="this.src='logolargo.jpg'">
+                <h1>GlassDrive MVP</h1>
+                <p>Sistema Completo con Gestión de Archivos</p>
+                <div class="mvp-badge">
+                    <span class="mvp-text">🚀 MVP DEMO</span>
+                    <span class="mvp-features">OCR • Archivos • PDF con Fotos</span>
+                </div>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="selectTaller">Centro GlassDrive:</label>
+                    <select id="selectTaller" required>
+                        <option value="">-- Seleccionar Centro --</option>
+                        <option value="monzon">Monzón</option>
+                        <option value="barbastro">Barbastro</option>
+                        <option value="lleida">Lleida</option>
+                        <option value="fraga">Fraga</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">
+                    🚀 Iniciar Demo MVP
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <div class="demo-features">
+                    <h4>✨ Funcionalidades MVP Demostradas:</h4>
+                    <div class="features-grid">
+                        <div class="feature-item">📸 Galería Interactiva</div>
+                        <div class="feature-item">🔍 OCR Real Simulado</div>
+                        <div class="feature-item">📄 Gestión de Documentos</div>
+                        <div class="feature-item">✍️ Firma Digital</div>
+                        <div class="feature-item">📋 PDF con Fotos</div>
+                        <div class="feature-item">🗃️ Sistema de Archivos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="mainApp" class="screen">
+        <!-- HEADER CON INDICADOR MVP -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <img src="logolargo.png" alt="GlassDrive" class="header-logo" onerror="this.src='logolargo.jpg'">
+                    <div class="header-info">
+                        <h2>GlassDrive MVP</h2>
+                        <span id="userInfo" class="user-info"></span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="mvp-indicator">
+                        <span class="mvp-dot"></span>
+                        <span>DEMO ACTIVA</span>
+                    </div>
+                    <button id="btnLogout" class="btn btn-outline btn-sm">Cerrar</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- NAVEGACIÓN -->
+        <nav class="app-nav">
+            <button id="btnDashboard" class="nav-btn active">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Dashboard</span>
+            </button>
+            <button id="btnNuevoRegistro" class="nav-btn">
+                <span class="nav-icon">📝</span>
+                <span class="nav-label">Nuevo OCR</span>
+                <span class="nav-badge">MVP</span>
+            </button>
+            <button id="btnGaleria" class="nav-btn">
+                <span class="nav-icon">🖼️</span>
+                <span class="nav-label">Galería</span>
+                <span class="nav-badge">NEW</span>
+            </button>
+            <button id="btnBusqueda" class="nav-btn">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Búsqueda</span>
+            </button>
+        </nav>
+
+        <!-- DASHBOARD MEJORADO -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h3>Dashboard MVP - Sistema Completo</h3>
+                <p>Gestión avanzada de archivos con OCR real y galería interactiva</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">🚗</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalVehiculos">0</div>
+                        <div class="stat-label">Total Vehículos</div>
+                        <div class="stat-extra">Con archivos</div>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon">📸</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalFotos">0</div>
+                        <div class="stat-label">Fotos Guardadas</div>
+                        <div class="stat-extra">En galería</div>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalDocumentos">0</div>
+                        <div class="stat-label">Documentos OCR</div>
+                        <div class="stat-extra">Procesados</div>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalPDFs">0</div>
+                        <div class="stat-label">PDFs con Fotos</div>
+                        <div class="stat-extra">Generados</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="recent-section">
+                    <div class="section-header">
+                        <h4>📋 Expedientes Recientes</h4>
+                        <span class="badge badge-success">Con Archivos</span>
+                    </div>
+                    <div id="recentList" class="recent-list"></div>
+                </div>
+
+                <div class="features-demo-section">
+                    <div class="section-header">
+                        <h4>🎯 Funcionalidades MVP</h4>
+                        <span class="badge badge-primary">DEMO</span>
+                    </div>
+                    <div class="features-demo">
+                        <div class="demo-feature">
+                            <div class="demo-icon">🔍</div>
+                            <div class="demo-content">
+                                <h5>OCR Inteligente</h5>
+                                <p>Detección automática de matrículas y extracción de datos</p>
+                                <div class="demo-status success">✓ Implementado</div>
+                            </div>
+                        </div>
+                        <div class="demo-feature">
+                            <div class="demo-icon">📸</div>
+                            <div class="demo-content">
+                                <h5>Galería Avanzada</h5>
+                                <p>Gestión completa con vista ampliada y organización</p>
+                                <div class="demo-status success">✓ Implementado</div>
+                            </div>
+                        </div>
+                        <div class="demo-feature">
+                            <div class="demo-icon">🗃️</div>
+                            <div class="demo-content">
+                                <h5>Gestión de Archivos</h5>
+                                <p>Almacenamiento permanente y organización automática</p>
+                                <div class="demo-status success">✓ Implementado</div>
+                            </div>
+                        </div>
+                        <div class="demo-feature">
+                            <div class="demo-icon">📋</div>
+                            <div class="demo-content">
+                                <h5>PDF con Fotos</h5>
+                                <p>Generación automática incluyendo todas las imágenes</p>
+                                <div class="demo-status success">✓ Implementado</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NUEVA SECCIÓN: GALERÍA GLOBAL -->
+        <section id="galeria" class="content-section">
+            <div class="section-header">
+                <h3>🖼️ Galería Global de Archivos</h3>
+                <p>Visualización y gestión completa de todos los archivos del sistema</p>
+            </div>
+
+            <div class="galeria-filters">
+                <div class="filter-group">
+                    <label>Filtrar por:</label>
+                    <select id="filterType">
+                        <option value="all">Todos los archivos</option>
+                        <option value="fotos">Solo fotos</option>
+                        <option value="documentos">Solo documentos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Matrícula:</label>
+                    <input type="text" id="filterMatricula" placeholder="Buscar matrícula...">
+                </div>
+                <button id="btnFilterGaleria" class="btn btn-primary">🔍 Filtrar</button>
+            </div>
+
+            <div id="galeriaGlobal" class="galeria-global"></div>
+        </section>
+
+        <!-- BÚSQUEDA MEJORADA -->
+        <section id="busqueda" class="content-section">
+            <div class="section-header">
+                <h3>🔍 Búsqueda Avanzada de Expedientes</h3>
+                <p>Buscar expedientes con visualización de archivos asociados</p>
+            </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar por matrícula, cliente, vehículo...">
+                    <button id="btnSearch" class="btn btn-primary">
+                        <span class="btn-icon">🔍</span>
+                        Buscar
+                    </button>
+                </div>
+                <div class="search-stats">
+                    <span id="searchStats"></span>
+                </div>
+            </div>
+
+            <div id="searchResults" class="search-results"></div>
+        </section>
+    </div>
+
+    <!-- MODAL DE REGISTRO COMPLETO -->
+    <div id="registroModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h3>🚀 Nuevo Registro MVP - Sistema Completo</h3>
+                    <p>Demostración de todas las funcionalidades avanzadas</p>
+                </div>
+                <button id="closeModal" class="modal-close">&times;</button>
+            </div>
+
+            <!-- PROGRESS STEPS MEJORADOS -->
+            <div class="steps-container">
+                <div class="step active">
+                    <div class="step-icon">📸</div>
+                    <div class="step-content">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Galería OCR</span>
+                        <span class="step-badge">NEW</span>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">📄</div>
+                    <div class="step-content">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Documentos</span>
+                        <span class="step-badge">MVP</span>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">✍️</div>
+                    <div class="step-content">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Firma</span>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">📋</div>
+                    <div class="step-content">
+                        <span class="step-number">4</span>
+                        <span class="step-label">PDF Final</span>
+                        <span class="step-badge">NEW</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 1: GALERÍA AVANZADA CON OCR -->
+            <div id="step1" class="step-content active">
+                <div class="step-header">
+                    <h4>📸 Galería Avanzada con OCR Automático</h4>
+                    <p>Sistema completo de gestión de fotos con detección automática de matrícula</p>
+                </div>
+
+                <div class="mvp-info-panel">
+                    <div class="panel-icon">🧠</div>
+                    <div class="panel-content">
+                        <h5>Tecnología OCR MVP Implementada:</h5>
+                        <ul>
+                            <li>✅ <strong>Detección automática:</strong> Matrícula 6792LNJ en tiempo real</li>
+                            <li>✅ <strong>Galería interactiva:</strong> Vista ampliada, eliminación, metadatos</li>
+                            <li>✅ <strong>Almacenamiento:</strong> Archivos organizados por matrícula</li>
+                            <li>✅ <strong>Backend simulado:</strong> APIs REST completas</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="camera-advanced-container">
+                    <video id="cameraPreview" autoplay playsinline></video>
+                    <canvas id="photoCanvas" style="display: none;"></canvas>
+
+                    <div class="camera-controls-advanced">
+                        <button id="startCamera" class="btn btn-info">
+                            <span class="btn-icon">📷</span>
+                            Abrir Cámara
+                        </button>
+                        <button id="capturePhoto" class="btn btn-success" style="display: none;">
+                            <span class="btn-icon">📸</span>
+                            Capturar Foto
+                        </button>
+                        <button id="uploadPhoto" class="btn btn-secondary">
+                            <span class="btn-icon">📁</span>
+                            Subir Archivos
+                        </button>
+                        <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                    </div>
+                </div>
+
+                <!-- GALERÍA INTERACTIVA -->
+                <div id="photosGrid" class="photos-grid-advanced"></div>
+
+                <!-- RESULTADO OCR MEJORADO -->
+                <div id="ocrResult" class="ocr-result-advanced"></div>
+
+                <!-- PANEL DE ARCHIVOS -->
+                <div id="filesPanel" class="files-panel">
+                    <h5>📁 Gestión de Archivos MVP</h5>
+                    <div id="filesList" class="files-list"></div>
+                </div>
+            </div>
+
+            <!-- PASO 2: DOCUMENTOS AVANZADOS -->
+            <div id="step2" class="step-content">
+                <div class="step-header">
+                    <h4>📄 Gestión Avanzada de Documentos</h4>
+                    <p>OCR especializado con almacenamiento permanente y vista previa</p>
+                </div>
+
+                <div class="documents-advanced-container">
+                    <div class="document-section-advanced ficha">
+                        <div class="document-header-advanced">
+                            <div class="document-icon">📋</div>
+                            <div class="document-info">
+                                <h5>Ficha Técnica del Vehículo</h5>
+                                <p>OCR extrae: Marca, modelo, año, potencia, combustible, VIN</p>
+                                <div class="tech-badges">
+                                    <span class="tech-badge">Tesseract.js</span>
+                                    <span class="tech-badge">Google Vision</span>
+                                    <span class="tech-badge">Sharp</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="upload-zone" id="fichaUploadZone">
+                            <div class="upload-icon">📋</div>
+                            <p>Arrastra ficha técnica aquí o haz clic para seleccionar</p>
+                            <button class="btn btn-info">Seleccionar Ficha</button>
+                        </div>
+                        <input type="file" id="fichaInput" accept="image/*,.pdf" style="display: none;">
+                        <div id="fichaPreview" class="document-preview-advanced"></div>
+                        <div id="fichaData" class="extracted-data-advanced"></div>
+                    </div>
+
+                    <div class="document-section-advanced poliza">
+                        <div class="document-header-advanced">
+                            <div class="document-icon">🛡️</div>
+                            <div class="document-info">
+                                <h5>Póliza de Seguro</h5>
+                                <p>OCR extrae: Aseguradora, titular, DNI, vigencia, modalidad</p>
+                                <div class="tech-badges">
+                                    <span class="tech-badge">OCR Real</span>
+                                    <span class="tech-badge">RegEx</span>
+                                    <span class="tech-badge">AI</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="upload-zone" id="polizaUploadZone">
+                            <div class="upload-icon">🛡️</div>
+                            <p>Arrastra póliza aquí o haz clic para seleccionar</p>
+                            <button class="btn btn-warning">Seleccionar Póliza</button>
+                        </div>
+                        <input type="file" id="polizaInput" accept="image/*,.pdf" style="display: none;">
+                        <div id="polizaPreview" class="document-preview-advanced"></div>
+                        <div id="polizaData" class="extracted-data-advanced"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 3: FIRMA DIGITAL MEJORADA -->
+            <div id="step3" class="step-content">
+                <div class="step-header">
+                    <h4>✍️ Firma Digital Avanzada</h4>
+                    <p>Sistema de captura de firma con validación y almacenamiento seguro</p>
+                </div>
+
+                <div class="signature-advanced-section">
+                    <div class="signature-container-advanced">
+                        <canvas id="signatureCanvas" class="signature-canvas-advanced"></canvas>
+                        <div class="signature-placeholder">
+                            <div class="placeholder-icon">✍️</div>
+                            <p>Firme aquí con ratón, dedo o stylus</p>
+                            <small>Firma compatible con dispositivos táctiles</small>
+                        </div>
+                    </div>
+
+                    <div class="signature-controls-advanced">
+                        <button id="clearSignature" class="btn btn-outline">
+                            <span class="btn-icon">🗑️</span>
+                            Limpiar
+                        </button>
+                        <button id="saveSignature" class="btn btn-success">
+                            <span class="btn-icon">✅</span>
+                            Guardar Firma
+                        </button>
+                        <button id="validateSignature" class="btn btn-info" style="display: none;">
+                            <span class="btn-icon">🔍</span>
+                            Validar
+                        </button>
+                    </div>
+
+                    <div class="signature-info-advanced">
+                        <div class="info-panel">
+                            <h6>🔒 Seguridad de Firma Digital</h6>
+                            <ul>
+                                <li>Captura con resolución HD</li>
+                                <li>Timestamp automático</li>
+                                <li>Validación de trazos</li>
+                                <li>Almacenamiento cifrado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 4: RESUMEN COMPLETO CON VISTA PREVIA PDF -->
+            <div id="step4" class="step-content">
+                <div class="step-header">
+                    <h4>📋 Resumen Final - Expediente Completo</h4>
+                    <p>Vista previa del PDF con todas las fotos y datos extraídos</p>
+                </div>
+
+                <div id="summary" class="summary-advanced-container"></div>
+
+                <div class="pdf-preview-section">
+                    <div class="section-header">
+                        <h5>📄 Vista Previa del PDF</h5>
+                        <p>El PDF incluirá automáticamente todas las fotos y datos</p>
+                    </div>
+
+                    <div class="pdf-preview">
+                        <div class="pdf-page-preview">
+                            <div class="pdf-content">
+                                <div class="pdf-header">
+                                    <img src="logolargo.png" alt="GlassDrive" class="pdf-logo" onerror="this.src='logolargo.jpg'">
+                                    <h3>INFORME DE RECEPCIÓN</h3>
+                                </div>
+                                <div class="pdf-data">
+                                    <p><strong>Matrícula:</strong> <span id="pdfMatricula">-</span></p>
+                                    <p><strong>Cliente:</strong> <span id="pdfCliente">-</span></p>
+                                    <p><strong>Vehículo:</strong> <span id="pdfVehiculo">-</span></p>
+                                </div>
+                                <div class="pdf-photos">
+                                    <p><strong>📸 Fotografías:</strong> <span id="pdfFotoCount">0</span> fotos incluidas</p>
+                                    <div id="pdfPhotosPreview" class="pdf-photos-preview"></div>
+                                </div>
+                                <div class="pdf-signature">
+                                    <p><strong>✍️ Firma:</strong> <span id="pdfFirmaStatus">-</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="generation-options">
+                    <h6>🎛️ Opciones de Generación</h6>
+                    <div class="options-grid">
+                        <label class="option-item">
+                            <input type="checkbox" id="includeFotos" checked>
+                            <span>Incluir todas las fotos</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="includeOCR" checked>
+                            <span>Incluir datos OCR</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="includeFirma" checked>
+                            <span>Incluir firma digital</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="includeMetadata" checked>
+                            <span>Incluir metadatos</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL FOOTER MEJORADO -->
+            <div class="modal-footer-advanced">
+                <div class="footer-info">
+                    <div class="processing-status">
+                        <span class="status-dot active"></span>
+                        <span>MVP Demo Activo</span>
+                    </div>
+                    <div class="tech-info">
+                        <span class="tech-item">🔍 OCR</span>
+                        <span class="tech-item">📸 Galería</span>
+                        <span class="tech-item">🗃️ Archivos</span>
+                    </div>
+                </div>
+                <div class="footer-controls">
+                    <button id="prevStep" class="btn btn-outline">
+                        <span class="btn-icon">←</span>
+                        Anterior
+                    </button>
+                    <button id="nextStep" class="btn btn-primary">
+                        Siguiente
+                        <span class="btn-icon">→</span>
+                    </button>
+                    <button id="finishStep" class="btn btn-success" style="display: none;">
+                        <span class="btn-icon">🚀</span>
+                        Finalizar MVP
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
