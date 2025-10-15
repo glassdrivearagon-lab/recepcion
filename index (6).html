@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassDrive MVP Demo</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- PANTALLA DE LOGIN -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="logolargo.png" alt="GlassDrive" class="login-logo-responsive">
+                <h1>GlassDrive MVP</h1>
+                <p>Sistema completo con gestión de archivos</p>
+                <div class="mvp-badge">
+                    <span class="mvp-text">🚀 MVP DEMO</span>
+                    <span class="mvp-features">OCR • Archivos • PDF con Fotos</span>
+                </div>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="selectTaller">Centro GlassDrive:</label>
+                    <select id="selectTaller" required>
+                        <option value="">-- Seleccionar Centro --</option>
+                        <option value="monzon">Monzón</option>
+                        <option value="barbastro">Barbastro</option>
+                        <option value="lleida">Lleida</option>
+                        <option value="fraga">Fraga</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">
+                    🚀 Iniciar Demo MVP
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="mainApp" class="screen">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <img src="logolargo.png" alt="GlassDrive" class="header-logo-responsive">
+                    <div class="header-info">
+                        <h2>GlassDrive MVP</h2>
+                        <span id="userInfo" class="user-info"></span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="mvp-indicator">
+                        <span class="mvp-dot"></span>
+                        <span>DEMO ACTIVA</span>
+                    </div>
+                    <button id="btnLogout" class="btn btn-outline btn-sm">Cerrar</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- NAVEGACIÓN -->
+        <nav class="app-nav">
+            <button id="btnDashboard" class="nav-btn active">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Dashboard</span>
+            </button>
+            <button id="btnNuevoRegistro" class="nav-btn">
+                <span class="nav-icon">📝</span>
+                <span class="nav-label">Nuevo OCR</span>
+                <span class="nav-badge">MVP</span>
+            </button>
+            <button id="btnGaleria" class="nav-btn">
+                <span class="nav-icon">🖼️</span>
+                <span class="nav-label">Galería</span>
+            </button>
+            <button id="btnBusqueda" class="nav-btn">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Búsqueda</span>
+            </button>
+        </nav>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h3>Dashboard MVP - Sistema Completo</h3>
+                <p>Gestión avanzada de archivos con OCR real y galería interactiva</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">🚗</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalVehiculos">0</div>
+                        <div class="stat-label">Total Vehículos</div>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon">📸</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalFotos">0</div>
+                        <div class="stat-label">Fotos Guardadas</div>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalDocumentos">0</div>
+                        <div class="stat-label">Documentos OCR</div>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalPDFs">0</div>
+                        <div class="stat-label">PDFs con Fotos</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-section">
+                <div class="section-header">
+                    <h4>📋 Expedientes Recientes</h4>
+                </div>
+                <div id="recentList" class="recent-list"></div>
+            </div>
+        </section>
+
+        <!-- GALERÍA -->
+        <section id="galeria" class="content-section">
+            <div class="section-header">
+                <h3>🖼️ Galería Global</h3>
+                <p>Todos los archivos del sistema organizados</p>
+            </div>
+            <div id="galeriaContent" class="galeria-content"></div>
+        </section>
+
+        <!-- BÚSQUEDA -->
+        <section id="busqueda" class="content-section">
+            <div class="section-header">
+                <h3>🔍 Búsqueda de Expedientes</h3>
+                <p>Buscar expedientes con archivos</p>
+            </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar por matrícula, cliente, vehículo...">
+                    <button id="btnSearch" class="btn btn-primary">🔍 Buscar</button>
+                </div>
+            </div>
+
+            <div id="searchResults" class="search-results"></div>
+        </section>
+    </div>
+
+    <!-- MODAL DE NUEVO REGISTRO -->
+    <div id="registroModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h3>📝 Nuevo Expediente Completo</h3>
+                    <p>Captura fotos, documentos, firma y genera PDF</p>
+                </div>
+                <button id="closeModal" class="modal-close">&times;</button>
+            </div>
+
+            <!-- STEPS NAVIGATION -->
+            <div class="steps-container">
+                <div class="step active" data-step="1">
+                    <div class="step-icon">📸</div>
+                    <div class="step-content">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Captura Fotos</span>
+                    </div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-icon">📋</div>
+                    <div class="step-content">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Ficha Técnica</span>
+                    </div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-icon">🛡️</div>
+                    <div class="step-content">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Póliza</span>
+                    </div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-icon">✍️</div>
+                    <div class="step-content">
+                        <span class="step-number">4</span>
+                        <span class="step-label">Firma</span>
+                    </div>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-icon">📄</div>
+                    <div class="step-content">
+                        <span class="step-number">5</span>
+                        <span class="step-label">Informe PDF</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENIDO DE PASOS -->
+            <div id="modalBody" class="modal-body">
+                <!-- PASO 1: CAPTURA DE FOTOS CON OCR -->
+                <div id="step1" class="step-panel active">
+                    <div class="step-header">
+                        <h4>📸 Captura de Fotografías</h4>
+                        <p>Capture fotos del vehículo con detección automática de matrícula</p>
+                    </div>
+
+                    <div class="camera-section">
+                        <div class="camera-controls">
+                            <button id="startCamera" class="btn btn-info">📷 Activar Cámara</button>
+                            <button id="capturePhoto" class="btn btn-success" style="display: none;">📸 Capturar</button>
+                            <button id="uploadPhoto" class="btn btn-secondary">📁 Subir Fotos</button>
+                        </div>
+
+                        <div class="camera-container">
+                            <video id="cameraPreview" autoplay playsinline></video>
+                            <canvas id="photoCanvas" style="display: none;"></canvas>
+                        </div>
+
+                        <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+                    </div>
+
+                    <div id="photosGrid" class="photos-grid-modal"></div>
+
+                    <div id="ocrResult" class="ocr-result-section"></div>
+                </div>
+
+                <!-- PASO 2: FICHA TÉCNICA -->
+                <div id="step2" class="step-panel">
+                    <div class="step-header">
+                        <h4>📋 Ficha Técnica del Vehículo</h4>
+                        <p>Suba la ficha técnica para extracción automática de datos</p>
+                    </div>
+
+                    <div class="document-upload-section">
+                        <div class="upload-zone" id="fichaUploadZone">
+                            <div class="upload-icon">📋</div>
+                            <p><strong>Arrastra aquí la ficha técnica</strong></p>
+                            <p>o haz clic para seleccionar archivo</p>
+                            <div class="upload-formats">PDF, JPG, PNG</div>
+                        </div>
+                        <input type="file" id="fichaInput" accept="image/*,.pdf" style="display: none;">
+                    </div>
+
+                    <div id="fichaPreview" class="document-preview-section"></div>
+                    <div id="fichaData" class="extracted-data-section"></div>
+                </div>
+
+                <!-- PASO 3: PÓLIZA DE SEGURO -->
+                <div id="step3" class="step-panel">
+                    <div class="step-header">
+                        <h4>🛡️ Póliza de Seguro</h4>
+                        <p>Suba la póliza para extracción de datos del seguro</p>
+                    </div>
+
+                    <div class="document-upload-section">
+                        <div class="upload-zone" id="polizaUploadZone">
+                            <div class="upload-icon">🛡️</div>
+                            <p><strong>Arrastra aquí la póliza</strong></p>
+                            <p>o haz clic para seleccionar archivo</p>
+                            <div class="upload-formats">PDF, JPG, PNG</div>
+                        </div>
+                        <input type="file" id="polizaInput" accept="image/*,.pdf" style="display: none;">
+                    </div>
+
+                    <div id="polizaPreview" class="document-preview-section"></div>
+                    <div id="polizaData" class="extracted-data-section"></div>
+                </div>
+
+                <!-- PASO 4: FIRMA DIGITAL -->
+                <div id="step4" class="step-panel">
+                    <div class="step-header">
+                        <h4>✍️ Firma Digital del Cliente</h4>
+                        <p>Capture la firma del cliente con alta calidad</p>
+                    </div>
+
+                    <div class="signature-section">
+                        <div class="signature-container">
+                            <canvas id="signatureCanvas" class="signature-canvas"></canvas>
+                            <div id="signaturePlaceholder" class="signature-placeholder">
+                                <div class="placeholder-icon">✍️</div>
+                                <p>Firme aquí con el dedo o stylus</p>
+                            </div>
+                        </div>
+
+                        <div class="signature-controls">
+                            <button id="clearSignature" class="btn btn-outline">🗑️ Limpiar</button>
+                            <button id="saveSignature" class="btn btn-success">✅ Guardar Firma</button>
+                        </div>
+
+                        <div class="signature-info">
+                            <p>📝 La firma se captura en alta resolución</p>
+                            <p>📱 Compatible con dedos y stylus</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 5: INFORME PDF FINAL -->
+                <div id="step5" class="step-panel">
+                    <div class="step-header">
+                        <h4>📄 Generar Informe Completo</h4>
+                        <p>Revise los datos y genere el PDF final</p>
+                    </div>
+
+                    <div id="expedienteSummary" class="expediente-summary"></div>
+
+                    <div class="pdf-generation-section">
+                        <div class="pdf-options">
+                            <h5>🎯 Opciones del Informe</h5>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="includePhotos" checked>
+                                <span>Incluir todas las fotografías</span>
+                            </label>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="includeTechnicalData" checked>
+                                <span>Incluir datos de ficha técnica</span>
+                            </label>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="includeInsuranceData" checked>
+                                <span>Incluir datos de póliza</span>
+                            </label>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="includeSignature" checked>
+                                <span>Incluir firma digital</span>
+                            </label>
+                        </div>
+
+                        <div class="pdf-preview-section">
+                            <h5>👁️ Vista Previa del Informe</h5>
+                            <div class="pdf-preview-container">
+                                <div class="pdf-page-preview">
+                                    <div class="pdf-header-preview">
+                                        <img src="logolargo.png" alt="GlassDrive" class="pdf-logo-preview">
+                                        <div class="pdf-center-info">Centro: <span id="pdfCentro"></span></div>
+                                    </div>
+                                    <div class="pdf-content-preview">
+                                        <p><strong>Matrícula:</strong> <span id="pdfMatricula">-</span></p>
+                                        <p><strong>Cliente:</strong> <span id="pdfCliente">-</span></p>
+                                        <p><strong>Fotos:</strong> <span id="pdfFotosCount">0</span></p>
+                                        <p><strong>Documentos:</strong> <span id="pdfDocsCount">0</span></p>
+                                        <p><strong>Firma:</strong> <span id="pdfFirmaStatus">-</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="generate-pdf-section">
+                            <button id="generatePDF" class="btn btn-primary btn-large">
+                                📄 Generar y Descargar Informe PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL FOOTER -->
+            <div class="modal-footer">
+                <div class="footer-progress">
+                    <div class="progress-info">
+                        <span id="stepInfo">Paso 1 de 5</span>
+                        <span class="separator">•</span>
+                        <span class="demo-indicator">🟢 Demo MVP</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="footer-controls">
+                    <button id="prevStep" class="btn btn-outline" style="display: none;">
+                        ← Anterior
+                    </button>
+                    <button id="nextStep" class="btn btn-primary">
+                        Siguiente →
+                    </button>
+                    <button id="completeProcess" class="btn btn-success" style="display: none;">
+                        🎉 Completar Proceso
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
